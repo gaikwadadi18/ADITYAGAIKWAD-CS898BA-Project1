@@ -1,0 +1,8 @@
+AI Usage Log
+Date and Time	Prompt	AI Tool	Response Synopsis	Design / Code Changes
+06/14/2026	Explain Homework 1 requirements and project structure.	ChatGPT	Provided assignment breakdown, recommended folder structure, and workflow guidance.	Created repository structure, project folders, README, and source files.
+06/14/2026	Explain how to compute image statistics and organize Part 2.	ChatGPT	Explained image statistics requirements and OpenCV workflow.	Implemented image statistics calculations and saved results.
+06/14/2026	Explain color space conversions, histogram equalization, and affine transformations.	ChatGPT	Explained image conversion methods and transformation techniques.	Implemented grayscale, binary, HSV, LAB, HLS conversions, histogram equalization, and affine transformations.
+06/14/2026	Explain Gaussian blur processing and image generation requirements.	ChatGPT	Provided guidance on applying Gaussian blur with multiple sigma values and organizing outputs.	Implemented Gaussian blur generation for all required images.
+06/14/2026	Explain image subset generation, edge detection methods, and result analysis.	ChatGPT	Explained Sobel, Laplacian, Canny, and Prewitt edge detection techniques and comparison methodology.	Implemented edge detection pipeline and generated comparison outputs.
+06/14/2026	Explain plot generation and README organization.	ChatGPT	Provided guidance for creating comparison plots and documenting project results.	Generated comparison plots and completed README documentation.

@@ -1,0 +1,33 @@
+
+Blue Channel
+Min: 0
+Max: 255
+Mean: 21.830971194466205
+Median: 10.0
+Mode: 4
+Skew: 1.6835408148148125
+Range: 255
+Std Dev: 26.091978344210116
+Variance: 680.7913339147296
+
+Green Channel
+Min: 0
+Max: 255
+Mean: 24.63967379140555
+Median: 16.0
+Mode: 11
+Skew: 1.7675735882491266
+Range: 255
+Std Dev: 22.066148099195043
+Variance: 486.914891935609
+
+Red Channel
+Min: 0
+Max: 255
+Mean: 20.607353681736797
+Median: 12.0
+Mode: 4
+Skew: 2.119330325572977
+Range: 255
+Std Dev: 22.2934789234853
+Variance: 496.9992025118833
