@@ -3,5 +3,4 @@ __pycache__/
 *.pyc
 
 images/blurred/
-images/edge_results/
 images/subsets/
