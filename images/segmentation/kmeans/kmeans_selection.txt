@@ -1,0 +1,9 @@
+K-Means cluster count comparison (HSV color space)
+
+K       Compactness    IoU vs GT
+3     8830226686.98       0.0212
+4     6784404721.27       0.0072
+5     5497053816.20       0.0706
+
+Chosen K = 5 (best IoU against the manual ground truth mask, not the compactness elbow - see script docstring)
+Foreground cluster index = 0
