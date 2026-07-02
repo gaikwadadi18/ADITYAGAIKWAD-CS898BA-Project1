@@ -301,3 +301,171 @@ production pipeline would need either adaptive/percentile-based Canny
 thresholds or a pre-processing contrast-normalization step (such as
 the histogram equalization already implemented in this project) to
 make Canny reliable across a varied dataset like this one.
+
+---
+
+# Homework 2 — Image Segmentation
+
+Branch: `Feature-Segmentation`. Note: the assignment refers to
+"README.md" but this project's existing documentation file from
+Homework 1 is `read.md` (lowercase) — Homework 2 content is appended
+to that same file rather than creating a second, separate README.
+
+## Setup and Execution
+
+```
+pip install -r requirements.txt
+python src/main_segmentation.py
+```
+
+This runs, in order: color normalization (Part 2), Otsu + Adaptive
+thresholding (Part 3), the manual ground truth mask, K-Means
+clustering (Part 4 — depends on the ground truth mask to select K,
+see below), and the final IoU/Dice evaluation + comparison plot
+(Part 5). Individual scripts can also be run on their own as long as
+their inputs already exist:
+
+```
+src/color_normalization.py
+src/threshold_segmentation.py
+src/ground_truth_mask.py
+src/kmeans_segmentation.py
+src/evaluate_segmentation.py
+```
+
+## Part 2: Multi-Channel Color Normalization
+
+`src/color_normalization.py` splits the original Homework 1 image
+into its raw B, G, R channels, applies histogram equalization to
+**each channel independently**, and merges them back into a color
+image (`images/segmentation/normalized/normalized_color.png`). This
+is a stronger normalization than Homework 1's approach, which only
+equalized the HSV Value channel — stretching contrast in all three
+channels separately makes the previously very dark, low-contrast
+scene dramatically clearer, at the cost of shifting color balance
+slightly (independent per-channel equalization does not preserve
+hue/saturation the way single-channel equalization does).
+
+## Part 3: Threshold-Based Segmentation
+
+`src/threshold_segmentation.py` converts the normalized image to
+grayscale and applies:
+
+- **Otsu's global threshold** — automatically picks one intensity
+  cutoff for the whole image. Chosen value: 130.
+- **Adaptive Gaussian threshold** — computes a locally-varying cutoff
+  per neighborhood (block size 25, C = 5).
+
+Masks and foreground extractions for both are saved under
+`images/segmentation/otsu/` and `images/segmentation/adaptive/`.
+
+## Part 4: K-Means Clustering
+
+`src/kmeans_segmentation.py` converts the normalized image to HSV and
+clusters pixel colors with K-Means for K = 3, 4, and 5.
+
+**K selection.** An initial pass compared K values by compactness
+(inertia) alone — the standard "elbow" heuristic — which pointed to
+K = 4. However, scoring each K by actual IoU against the Part 5
+ground truth mask told a different story:
+
+| K | Compactness | IoU vs ground truth |
+|---|---|---|
+| 3 | 8,830,226,686.98 | 0.0212 |
+| 4 | 6,784,404,721.27 | 0.0072 |
+| 5 | 5,497,053,816.20 | **0.0706** |
+
+K = 4 — the compactness "elbow" choice — was actually the **worst**
+of the three at isolating the figure. Compactness alone measures
+general cluster tightness, not accuracy against any specific target
+object, so it is not a reliable guide here. **K = 5 was used instead**,
+selected by IoU against the ground truth. Mask and foreground
+extraction are saved under `images/segmentation/kmeans/`.
+
+## Part 5: Evaluation and Analysis
+
+### Quantitative results
+
+| Method | IoU (Jaccard) | Dice Coefficient |
+|---|---|---|
+| Otsu | 0.0368 | 0.0710 |
+| Adaptive | 0.0188 | 0.0369 |
+| K-Means (K=5) | **0.0706** | **0.1319** |
+
+All three scores are low in absolute terms because none of these
+classical methods produce a clean, complete silhouette of the figure
+on this scene — but the relative comparison is still informative
+(see the ground truth mask methodology note below).
+
+### Qualitative discussion
+
+- **Otsu** achieves the highest *recall* of the figure (93.5% of
+  ground-truth figure pixels fall inside the Otsu mask) but very low
+  *precision*: because it is a single global threshold, it also
+  includes roughly half of the entire frame (sky, light grass,
+  house siding), so its IoU is pulled down by a large amount of
+  background noise despite rarely missing the figure itself.
+- **Adaptive thresholding** is the noisiest of the three. Because it
+  computes a threshold from each local neighborhood, it reacts
+  strongly to any local texture — grass blades, leaves, porch trim —
+  producing a mask that is mostly fine-grained background noise
+  rather than a coherent figure outline. It preserves some of the
+  figure's edges but at the cost of being unusable as a clean
+  foreground/background split on its own.
+- **K-Means** gives the best IoU/Dice of the three, but the resulting
+  mask is not a solid fill of the figure — it captures scattered
+  patches correlated with the figure's edges and higher-contrast
+  clothing regions rather than the whole body. This is a direct
+  consequence of Part 2's independent per-channel normalization:
+  boosting contrast in each channel separately increases local color
+  noise within what should be a visually uniform region (e.g. a solid
+  jacket), which fragments that region across multiple K-Means
+  clusters instead of keeping it as one. K-Means also has no spatial
+  awareness — it clusters purely by color — so a cluster can include
+  disconnected pixels anywhere in the frame that happen to share a
+  similar hue/saturation/value, which further hurts precision on a
+  cluttered outdoor scene.
+- **Effect of full 3-channel normalization vs. Homework 1.** Homework
+  1's single-channel (V only) equalization preserved hue/saturation
+  and gave a visually natural-looking brightened image. This
+  project's independent 3-channel equalization gives a much higher
+  raw-contrast image (useful for Otsu/Adaptive, which depend on a
+  wide intensity range) but distorts color relationships and adds
+  chromatic noise, which is specifically what hurt K-Means's ability
+  to find one coherent color cluster for the whole figure. In
+  short: stronger contrast normalization helped the two
+  intensity-based methods but worked against the one color-based
+  method.
+
+### Ground truth methodology note
+
+The reference mask (`images/segmentation/ground_truth/ground_truth_mask.png`)
+was created by manually identifying a bounding box around the figure
+by visual inspection of the source image, then refining it into a
+pixel-level silhouette with GrabCut seeded from that box
+(`src/ground_truth_mask.py`). This is a standard way to hand-annotate
+a clean reference mask without manually painting every pixel.
+
+### Comparison plot
+
+![Segmentation comparison: original, normalized, Otsu, Adaptive, K-Means](images/segmentation/comparison/segmentation_comparison.png)
+
+*Note on the assignment wording:* Part 5 asks for "the 4 final
+segmented masks," but Parts 3–4 only define 3 total segmentation
+methods (Otsu, Adaptive, K-Means). This project treats that as a
+wording inconsistency and includes all 3 methods' masks in the plot
+above alongside the original and normalized images (5 panels total).
+
+## Conclusion
+
+None of the three classical/clustering methods produce a clean,
+complete segmentation of the figure from this cluttered, unevenly-lit
+outdoor scene on their own. Otsu is the most reliable at not missing
+the figure but includes far too much background; Adaptive is too
+noisy to be useful alone; K-Means, once K is chosen based on actual
+segmentation accuracy rather than a generic compactness heuristic,
+gives the best balance of the three but is still fragmented rather
+than solid. A stronger real-world approach would likely combine
+methods — e.g. using K-Means or Otsu to seed a GrabCut/watershed
+refinement step, similar to how the ground truth mask itself was
+built — rather than relying on any single classical technique alone.
