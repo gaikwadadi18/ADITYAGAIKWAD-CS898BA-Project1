@@ -1,0 +1,6 @@
+Segmentation Evaluation vs Manual Ground Truth Mask
+
+Method          IoU     Dice
+Otsu         0.0368   0.0710
+Adaptive     0.0188   0.0369
+K-Means      0.0706   0.1319
