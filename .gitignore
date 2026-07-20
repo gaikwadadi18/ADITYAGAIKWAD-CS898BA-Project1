@@ -1,6 +1,6 @@
 venv/
 __pycache__/
-*.pyc
+# *.py
 
 images/blurred/
 images/subsets/
