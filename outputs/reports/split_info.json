@@ -1,0 +1,59 @@
+{
+  "classes": [
+    "Bete",
+    "Cray",
+    "Discuss",
+    "Gold",
+    "Guppy",
+    "Oscar"
+  ],
+  "class_to_idx": {
+    "Bete": 0,
+    "Cray": 1,
+    "Discuss": 2,
+    "Gold": 3,
+    "Guppy": 4,
+    "Oscar": 5
+  },
+  "counts_total": {
+    "Bete": 194,
+    "Cray": 80,
+    "Discuss": 201,
+    "Gold": 207,
+    "Guppy": 189,
+    "Oscar": 145
+  },
+  "counts_train": {
+    "Bete": 136,
+    "Cray": 56,
+    "Discuss": 141,
+    "Gold": 145,
+    "Guppy": 131,
+    "Oscar": 101
+  },
+  "counts_val": {
+    "Bete": 29,
+    "Cray": 12,
+    "Discuss": 30,
+    "Gold": 31,
+    "Guppy": 29,
+    "Oscar": 22
+  },
+  "counts_test": {
+    "Bete": 29,
+    "Cray": 12,
+    "Discuss": 30,
+    "Gold": 31,
+    "Guppy": 29,
+    "Oscar": 22
+  },
+  "class_weights": [
+    0.8700980544090271,
+    2.113095283508301,
+    0.839243471622467,
+    0.8160919547080994,
+    0.9033079147338867,
+    1.1716171503067017
+  ],
+  "img_size": 96
+}
